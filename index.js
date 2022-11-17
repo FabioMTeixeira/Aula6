@@ -1,3 +1,4 @@
+const { response } = require('express');
 const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
@@ -53,7 +54,11 @@ app.get('/cities/:id', async (req, res) => {
 
     const document = await CityModel.findById(id);
 
-    res.status(200).json(document);
+    if(document) {
+        res.status(200).json(document);
+    } else {
+        res.status(404).json({});
+    };
 })
 
 app.post('/cities', async (req, res) => {
@@ -63,6 +68,40 @@ app.post('/cities', async (req, res) => {
     const document = await newCity.save();
 
     res.status(201).json(document);
+});
+
+app.put('/cities/:id', async (req, res) => {
+    const data = { ...req.body };
+    const id = req.params.id;
+    const city = await CityModel.findById(id);
+
+    if(city) {
+        city.name = data.name;
+    
+        if (data.state) {
+            city.state.UF = data.state.UF;
+        };
+    
+        await city.save();
+    
+    
+        res.status(200).json(city);
+    } else {
+        res.status(404).json({});
+    };
+});
+
+app.delete('/cities/:id', async (req, res) => {
+    const id = req.params.id;
+    const city = await CityModel.findById(id);
+
+    if(city) {
+        await city.delete();
+    
+        res.status(200).json(city);
+    } else {
+        res.status(404).json({});
+    };
 });
 
 server();

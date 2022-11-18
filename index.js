@@ -75,20 +75,19 @@ app.put('/cities/:id', async (req, res) => {
     const id = req.params.id;
     const city = await CityModel.findById(id);
 
-    if(city) {
-        city.name = data.name;
-    
-        if (data.state) {
-            city.state.UF = data.state.UF;
-        };
-    
-        await city.save();
-    
-    
-        res.status(200).json(city);
-    } else {
-        res.status(404).json({});
+    if(!city) {
+        return res.status(404).json({});
+    }
+
+    city.name = data.name;
+
+    if (data.state) {
+        city.state.UF = data.state.UF;
     };
+
+    await city.save();
+
+    res.status(200).json(city);
 });
 
 app.delete('/cities/:id', async (req, res) => {
